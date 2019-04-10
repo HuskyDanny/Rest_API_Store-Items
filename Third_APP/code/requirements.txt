@@ -1,0 +1,4 @@
+Flask==1.0.2
+Flask_RESTful==0.3.7
+Werkzeug==0.15.2
+flask_jwt==0.3.2
