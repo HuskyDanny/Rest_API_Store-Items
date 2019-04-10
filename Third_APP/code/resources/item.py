@@ -4,6 +4,7 @@ import sqlite3
 from flask_jwt import jwt_required
 from flask_restful import Resource, reqparse
 from models.item import ItemModel
+from flask import jsonify
 class Item(Resource):
     #Enforce the arguments, parse_args will return those values
     #price here is required
@@ -30,7 +31,7 @@ class Item(Resource):
         item = ItemModel(name, data['price'])
 
         try:
-            item.insert()
+            item.save_to_db()
         except:
             return {"message":"Error occurred when inserting"}, 500
 
@@ -39,23 +40,19 @@ class Item(Resource):
     def put(self, name):
         data = Item.parser.parse_args()
         item = ItemModel.find_by_name(name)
-        update_item = ItemModel(name, data['price'])
+        
         if item:
-            try:
-                update_item.update()
-            except:
-                return {"message":"Update Failed"},500
+            item.price = data['price']
         else:
-            try:
-                update_item.insert()
-            except:
-                return {"message" : "Insert Failed"},500
+            item = ItemModel(name, data['price'])
+
+        item.save_to_db()
         return {"message":"Update completed"}
 
     def delete(self, name):
-        item = ItemModel(name)
+        item = ItemModel.find_by_name(name)
         try:
-            item.delete_item()
+            item.delete_from_db()
         except:
             return {"message":"Delete Failed"},500
         return {'message':'item deleted'}
@@ -63,16 +60,4 @@ class Item(Resource):
 class ItemList(Resource):
 
     def get(self):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        query_get = 'SELECT * FROM items'
-        result = cursor.execute(query_get)
-        items = {'items' : []}
-
-        for row in result:
-            items['items'].append({'name':row[0], 'price':row[1]})
-
-        connection.close()
-
-        return items
+        return {'items' : [model.json() for model in ItemModel.query.all()]}    

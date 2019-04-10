@@ -1,6 +1,12 @@
 import sqlite3
+from db import db
 
-class ItemModel:
+class ItemModel(db.Model):
+
+    __tablename__ = 'items'
+    id = db.Column(db.Integer, primary_key = True)
+    name = db.Column(db.String(80))
+    price = db.Column(db.Float(precision = 2))
 
     def __init__(self, name, price=None):
         self.name = name
@@ -13,39 +19,21 @@ class ItemModel:
     #since the method is used before creating this object, so we use classmethod
     @classmethod
     def find_by_name(cls, name):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        query_get = 'SELECT * FROM items WHERE name=?'
-        result = cursor.execute(query_get, (name,))
-        row = result.fetchone()
-        connection.close()
-        if row:
-            #*rows unpack each element of row into parameters
-            return cls(* row)
+        return cls.query.filter_by(name = name).first() #SELECT * FROM items WHERE name = name
+
+    @classmethod
+    def find_all(cls):
+        return cls.query
 
     #Insert into db by the given item(name,price)
-    def insert(self):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        query_post = 'INSERT INTO items VALUES(?,?)'
-        cursor.execute(query_post, (self.name, self.price))
-        connection.commit()
-        connection.close()
+    def save_to_db(self):
+        db.session.add(self)
+        db.session.commit()
 
     #Update the item with given name to price
-    def update(self):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        query_post = 'UPDATE items SET price=? WHERE name=?'
-        cursor.execute(query_post, (self.price, self.name))
-        connection.commit()
-        connection.close()
+    def delete_from_db(self):
+        db.session.delete(self)
+        db.session.commit()
 
-    #delete the record with given name
-    def delete_item(self):
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-        query_delete = 'DELETE FROM items WHERE name=?'
-        cursor.execute(query_delete, (self.name,))
-        connection.commit()
-        connection.close()
+
+        

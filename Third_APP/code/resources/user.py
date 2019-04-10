@@ -13,13 +13,7 @@ class UserRegister(Resource):
         #if things go wrong
         if UserModel.find_by_username(data['username']):
             return {'message' : 'username has been taken'}, 400
+        user = UserModel(**data)
+        user.save_to_db()
 
-        connection = sqlite3.connect('data.db')
-        cursor = connection.cursor()
-
-        register_query = "INSERT INTO users VALUES (NULL, ?, ?)"
-
-        cursor.execute(register_query, (data['username'], data['password']))
-        connection.commit()
-        connection.close()
-        return {'message': "User Registered Successfully"}, 201
+        return {"message":"User created"}, 201
