@@ -14,7 +14,11 @@ class Item(Resource):
         required = True,
         help = "Errors with Price Filed"
     )
-
+    parser.add_argument('store_id',
+        type = int,
+        required = True,
+        help = "store id for every item"
+    )
     #@jwt is used to enforce authentication
     @jwt_required()
     def get(self, name):
@@ -28,7 +32,7 @@ class Item(Resource):
             return {'message':'name already exists'}, 400
         #getting the data from body, only get price here because reqparse
         data = Item.parser.parse_args()
-        item = ItemModel(name, data['price'])
+        item = ItemModel(name, **data)
 
         try:
             item.save_to_db()
@@ -43,8 +47,9 @@ class Item(Resource):
         
         if item:
             item.price = data['price']
+            item.store_id = data['store_id']
         else:
-            item = ItemModel(name, data['price'])
+            item = ItemModel(name, data['price'], data['store_id'])
 
         item.save_to_db()
         return {"message":"Update completed"}
