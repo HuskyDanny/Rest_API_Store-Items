@@ -27,6 +27,6 @@ hs_err_pid*
 .ipynb*
 __pycache__
 .DS_Store
-item.cpython-37.pyc
-user.cpython-37.pyc
-.gitignore.swp
+*.pyc
+*.swp
+__pycache__/
