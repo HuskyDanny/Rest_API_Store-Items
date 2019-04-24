@@ -8,7 +8,6 @@ It is a practice for rest api using flask framework
 Third_APP is the most up-to-date one, it uses SQLalchemy to simplify SQL syntax and management. Go to the folder, venv is the setup environment to run. Remember to **source venv/bin/activate** to activate the virtual environment. Run the app.py in code folder.
 
 ### Prerequisites
-aniso8601==6.0.0
 certifi==2019.3.9
 chardet==3.0.4
 Click==7.0
